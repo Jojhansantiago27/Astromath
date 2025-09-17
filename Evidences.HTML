@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astromaths - El Juego de los Conjuntos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #0d1a2e;
+            color: #e0e0e0;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #1a2a43;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            border: 2px solid #3c6e71;
+        }
+
+        h1 {
+            color: #71b9f7;
+            font-size: 2.5em;
+        }
+
+        #question-box {
+            background-color: #2b425b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        #question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            background-color: #3c6e71;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .option-btn:hover {
+            background-color: #4a8083;
+            transform: translateY(-2px);
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        #score-box {
+            margin-top: 30px;
+            font-size: 1.2em;
+        }
+
+        #restart-btn {
+            background-color: #f77171;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #restart-btn:hover {
+            background-color: #d15656;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Astromaths 🚀</h1>
+        <p>¡Identifica el tipo de conjunto en cada pregunta!</p>
+
+        <div id="question-box">
+            <p id="question">Cargando pregunta...</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="checkAnswer('finito')">Finito</button>
+                <button class="option-btn" onclick="checkAnswer('infinito')">Infinito</button>
+                <button class="option-btn" onclick="checkAnswer('unitario')">Unitario</button>
+                <button class="option-btn" onclick="checkAnswer('vacío')">Vacío</button>
+            </div>
+        </div>
+
+        <p id="feedback"></p>
+        <div id="score-box">Puntuación: <span id="score">0</span> / <span id="total-questions">0</span></div>
+        
+        <button id="restart-btn" onclick="startGame()">Jugar de nuevo</button>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "Conjunto de estrellas en el universo", answer: "infinito" },
+            { question: "Conjunto de satélites naturales de la Tierra", answer: "unitario" },
+            { question: "Conjunto de días de la semana", answer: "finito" },
+            { question: "Conjunto de vacas que vuelan", answer: "vacío" },
+            { question: "Conjunto de planetas en nuestro sistema solar", answer: "finito" },
+            { question: "Conjunto de números enteros mayores a 100", answer: "infinito" },
+            { question: "Conjunto de triángulos con 4 lados", answer: "vacío" },
+            { question: "Conjunto de la Luna", answer: "unitario" },
+            { question: "Conjunto de números pares", answer: "infinito" },
+            { question: "Conjunto de letras del abecedario", answer: "finito" }
+        ];
+
+        let score = 0;
+        let questionCount = 0;
+        const maxQuestions = 5;
+        let currentQuestion;
+
+        const questionEl = document.getElementById('question');
+        const feedbackEl = document.getElementById('feedback');
+        const scoreEl = document.getElementById('score');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const restartBtn = document.getElementById('restart-btn');
+        const optionsContainer = document.querySelector('.options-container');
+
+        function startGame() {
+            score = 0;
+            questionCount = 0;
+            feedbackEl.textContent = "";
+            restartBtn.style.display = 'none';
+            optionsContainer.style.display = 'flex';
+            totalQuestionsEl.textContent = maxQuestions;
+            updateScoreDisplay();
+            showNextQuestion();
+        }
+
+        function showNextQuestion() {
+            if (questionCount >= maxQuestions) {
+                endGame();
+                return;
+            }
+            const availableQuestions = questions.filter(q => q !== currentQuestion);
+            currentQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+            questionEl.textContent = currentQuestion.question;
+            questionCount++;
+            feedbackEl.textContent = "";
+        }
+
+        function checkAnswer(userAnswer) {
+            if (userAnswer === currentQuestion.answer) {
+                score++;
+                feedbackEl.textContent = "¡Correcto! ";
+                feedbackEl.style.color = "#7fff00";
+            } else {
+                feedbackEl.textContent = `Incorrecto.  La respuesta correcta era: ${currentQuestion.answer}`;
+                feedbackEl.style.color = "#ff4500";
+            }
+            updateScoreDisplay();
+            setTimeout(showNextQuestion, 1500); // Espera un poco antes de la siguiente pregunta
+        }
+
+        function updateScoreDisplay() {
+            scoreEl.textContent = score;
+        }
+
+        function endGame() {
+            questionEl.textContent = `Juego terminado. Tu puntuación final es: ${score} de ${maxQuestions}.`;
+            optionsContainer.style.display = 'none';
+            feedbackEl.textContent = "";
+            restartBtn.style.display = 'block';
+        }
+
+        // Iniciar el juego al cargar la página
+        startGame();
+    </script>
+</body>
+</html>
